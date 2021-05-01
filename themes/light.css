@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+:root{
+    --text-color: #000000;
+    --main: #FFFFFF;
+    --light-main: #e7e2e2;
+    --lighter-main: #464343;
+    --accent-main: #ea6962;
+    --darker-accent: #b34242;
+    --secondary-accent: #5376b6;
+    --tertiary-accent: #4a6446;
+    --invalid: #956b17;
+
+    --contents-size: 400px;
+}
+
+html{
+    scroll-behavior: smooth;
+}
+
+body{
+    font-family: "Roboto";
+    color: var(--text-color);
+    background-color: var(--main);
+    line-height: 180%;
+
+    max-width: 1400px;
+    margin-left: calc(var(--contents-size) + 60px);
+}
+
+.invalidLink{
+    color: var(--invalid) !important;
+}
+
+.gallery{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    max-width: 1350px;
+    list-style: none;
+}
+
+.gallery div{
+    margin: 0 auto;
+    text-align: center;
+}
+
+.gallery p{
+    text-align: center;
+}
+
+
+.description, .selfreference, .fn{
+    color: var(--text-color);
+}
+
+/* for all classes that start with 'box' */
+[class^='box'], .tocnumber, More_citations_needed_section, .sidebar-navbar, .noprint, .noviewer{
+    display: none;
+}
+
+.vectorImage{
+    background-color: white;
+    padding: 1em;
+    margin-top: 1em;
+    box-shadow: none !important;
+}
+
+.navbar-mini{
+    display: none !important;
+}
+
+blockquote{
+    font-style: italic;
+    font-size: 80%;
+}
+
+a{
+    text-decoration: none;
+    color: var(--secondary-accent);
+    font-weight: 700;
+}
+
+a:visited{
+    color: var(--accent-main);
+}
+
+a:hover{
+    color: var(--text-color);
+}
+
+
+p{
+    text-align: justify;
+}
+
+img{
+    border-radius: 0.5em;
+    box-shadow: 0px 0px 20px 5px rgba(0, 0, 0, 0.5);
+}
+
+table{
+    background-color: var(--light-main) !important;
+    color: var(--text-color) !important;
+    border: none !important;
+    border-radius: 1em;
+    margin: 1em;
+}
+
+td{
+    background-color: var(--light-main);
+}
+
+th a{
+    color: var(--tertiary-accent);
+}
+
+th a:visited{
+    color: var(--darker-accent);
+}
+
+th{
+    border-radius: 0px !important;
+    background-color: var(--secondary-accent);
+    color: var(--text-color);
+}
+
+table ul{
+    text-align: left;
+}
+
+pre{
+    background-color: var(--light-main);
+    padding: 2em;
+    border-radius: 1em;
+}
+
+.reference{
+    font-size: 60%;
+    padding: 0.15em;
+}
+
+.sidebar, .infobox{
+    border: none !important;
+    clear: right;
+    float: right;
+    margin: 0.5em 0 1em 1em;
+    padding: 0.2em;
+    display: table;
+}
+
+.infobox-image{
+    text-align: center;
+}
+
+.infobox-above, .infobox-header{
+    color: var(--text-color);
+    background-color: var(--light-main) !important;
+}
+
+.sidebar-image a img{
+    margin: 1em;
+}
+
+.sidebar a{
+    color: var(--secondary-accent);
+}
+
+.sidebar a:hover{
+    color: var(--text-color);
+}
+
+.infobox td{
+    border: none !important;
+}
+
+.infobox th{
+    border: none !important;
+    background-color: var(--light-main);
+}
+
+.infobox a{
+    color: var(--secondary-accent);
+}
+
+.infobox a:hover{
+    color: var(--text-color);
+}
+
+.infobox-label{
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.sidebar td{
+    border: none !important;
+}
+
+.sidebar th{
+    border: none !important;
+    background-color: var(--light-main);
+}
+
+.wikitable, th, td{
+    border-collapse: collapse;
+    border: 1px solid black;
+    border-radius: 1em;
+    padding: 6px;
+}
+
+.tright{
+    float: right;
+    clear: right;
+    margin: 0.5em;
+    padding-left: 0.5em;
+}
+
+.tleft{
+    float: left;
+    clear: left;
+    margin: 0.5em;
+    padding-right: 0.5em;
+}
+
+.quotebox{
+    background-color: var(--light-main) !important;
+    border-radius: 1em;
+}
+
+.thumbcaption{
+    margin-top: 0.6em;
+    font-size: 80%;
+    font-style: italic;
+}
+
+#toc{
+    position: fixed;
+    width: var(--contents-size);
+    left: 20px;
+    top: 20px;
+    font-size: 1.2vh;
+    line-height: 1.5vh;
+}
+
+#toc a{
+    transition: 0.2s ease-in-out;
+}
+
+#toc a:hover{
+    color: var(--text-color);
+    font-size: 18px;
+}
+
+#articleTitle{
+    margin-top: 1em;
+    text-align: center;
+    text-transform: uppercase;
+}
