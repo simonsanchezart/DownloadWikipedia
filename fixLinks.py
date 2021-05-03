@@ -41,7 +41,6 @@ for htmlPath in allHtmlPaths:
                         possiblePath = innerHtmlPath
                         htmlFileName = os.path.basename(possiblePath)
                         if f"{articleName}.html" == htmlFileName:
-                            print(f"{articleName}.html is {htmlFileName}")
                             pathExists = True
                             break
 
