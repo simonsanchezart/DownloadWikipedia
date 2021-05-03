@@ -5,16 +5,16 @@ from bs4 import BeautifulSoup
 cwd = os.getcwd()
 
 allHtmlPaths = []
-for path, dirname, filenames in os.walk(cwd):
+for filePath, _, filenames in os.walk(cwd):
     for filename in filenames:
         if filename.endswith('.html'):
-            htmlPath = os.path.join(path, filename)
+            htmlPath = os.path.join(filePath, filename)
             allHtmlPaths.append(htmlPath)
 
 for htmlPath in allHtmlPaths:
     with open(htmlPath, 'r', encoding='utf-8') as f:
-        htmlContent = f.read()
-        soup = BeautifulSoup(htmlContent, 'html.parser')
+        content = f.read()
+        soup = BeautifulSoup(content, 'html.parser')
 
         for link in soup.find_all('a'):
             if 'href' in link.attrs:
@@ -33,12 +33,22 @@ for htmlPath in allHtmlPaths:
                         link['class'] = 'invalidLink'
                         link['href'] = wikiLink
                 elif linkHref.startswith('https://en.wikipedia.org/wiki/'):
+                    pathExists = False
+                    possiblePath = ''
+
                     articleName = linkHref.split('/')[-1]
-                    possiblePath = os.path.join(cwd, articleName, f"{articleName}.html")
-                    if os.path.exists(possiblePath):
-                        del link['class']
-                        link['href'] = possiblePath
-                        print(f"Added local link for: {articleName}")
+                    for innerHtmlPath in allHtmlPaths:
+                        possiblePath = innerHtmlPath
+                        htmlFileName = os.path.basename(possiblePath)
+                        if f"{articleName}.html" == htmlFileName:
+                            print(f"{articleName}.html is {htmlFileName}")
+                            pathExists = True
+                            break
+
+                    if pathExists:
+                            del link['class']
+                            link['href'] = possiblePath
+                            print(f"Added local link for: {articleName}")
                     else:
                         link['class'] = 'invalidLink'
 
