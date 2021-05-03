@@ -1,22 +1,20 @@
 import requests
-import re
 import os
 import pathlib
 import urllib.parse
 import sys
 from bs4 import BeautifulSoup
 
-saveWikiPath = pathlib.Path(__file__).parent.absolute()
-baseHtmlPath = os.path.join(saveWikiPath, 'base.html')
-cssThemes = os.path.join(saveWikiPath, 'themes')
+scriptPath = pathlib.Path(__file__).parent.absolute()
+baseHtmlPath = os.path.join(scriptPath, 'base.html')
+cssThemes = os.path.join(scriptPath, 'themes')
 
 invalidChars = ('\\', '/', ':', '*', '?', '"', '<', '>', '|', '(', ')', '%')
-invalidLinkSentences = ('png', 'jpeg', 'jpg', 'Wikipedia:', 'File:', '#', '.webm')
-def StripInvalid(incomingString):
+invalidWords = ('png', 'jpeg', 'jpg', 'Wikipedia:', 'File:', '#', '.webm')
+def StripInvalid(s):
     for char in invalidChars:
-        incomingString = incomingString.replace(char, '')
-
-    return incomingString
+        s = s.replace(char, '')
+    return s
 
 def NameFromLink(link):
     name = link.split('/')[-1]
@@ -26,53 +24,66 @@ def NameFromLink(link):
 
     return name
 
-theme = os.path.join(cssThemes, sys.argv[1]) 
+cssTheme = os.path.join(cssThemes, sys.argv[1]) 
 articleLinks = sys.argv[2:]
+
+i = 0
+mainLocalPath = os.getcwd()
+INNER_LINK_SUBDIRECTORY = 'internal'
 for articleLink in articleLinks:
     articleLink = urllib.parse.unquote(articleLink)
     articleName = NameFromLink(articleLink)
 
-    localPath = os.path.join(os.getcwd(), articleName)
-    htmlFinalPath = os.path.join(localPath, f"{articleName}.html")
+    if i == 0:
+        localPath = os.path.join(mainLocalPath, articleName)
+        mainLocalPath = localPath
+        i+=1
+    else:
+        localPath = os.path.join(mainLocalPath, INNER_LINK_SUBDIRECTORY, articleName)
+    htmlPath = os.path.join(localPath, f"{articleName}.html")
 
     try:
         response = requests.get(articleLink)
-        print(f"Code: {response.status_code}")
         if response.status_code != 200:
-            continue
+            raise Exception()
     except Exception as e:
-        print("Couldn't get {articleName}")
+        print(f"Couldn't get {articleName}")
         continue
 
     print(f"Downloading {articleName}...\n")
 
     content = response.text
     soup = BeautifulSoup(content, 'html.parser')
-    articleBody = soup.find(id='mw-content-text')
 
+    articleBody = soup.find(id='mw-content-text')
     for link in articleBody.find_all('a'):
         if 'href' in link.attrs:
             if link['href'].startswith('/wiki/'):
                 link['href'] = 'https://en.wikipedia.org' + link['href']
+                link['href'] = urllib.parse.unquote(link['href'])
 
                 mustContinue = False
-                for format in invalidLinkSentences:
-                    if format in link['href']:
+                for word in invalidWords:
+                    if word in link['href']:
                         mustContinue = True
                 if mustContinue:
                     continue
 
-                link['href'] = urllib.parse.unquote(link['href'])
                 articleLinks.append(link['href'])
                 subArticleName = NameFromLink(link['href'])
-                subArticleHtmlPath = os.path.join(os.getcwd(), subArticleName, f"{subArticleName}.html")
+                subArticleHtmlPath = os.path.join(mainLocalPath,
+                                                  INNER_LINK_SUBDIRECTORY,
+                                                  subArticleName,
+                                                  f"{subArticleName}.html")
                 link['href'] = subArticleHtmlPath 
 
     os.makedirs(localPath, exist_ok=True)
-    if os.path.exists(htmlFinalPath):
+    if os.path.exists(htmlPath):
         print(f"{articleName} already exists.\n")
         continue
 
+    imageBasePath = os.path.join(localPath, 'images')
+    os.makedirs(imageBasePath, exist_ok=True)
     try:
         for image in articleBody.find_all('img'):
             if 'https:' in image['src']:
@@ -80,36 +91,38 @@ for articleLink in articleLinks:
             else:
                 imageSrc = f"https:{image['src']}"
 
-            imageCompleteName = imageSrc.split('/')[-1]
-            imageCompleteName = StripInvalid(imageCompleteName)
+            imageName = imageSrc.split('/')[-1]
+            imageName = StripInvalid(imageName)
 
             # takes care of svg images
-            if len(imageCompleteName.split('.')) == 1:
+            if len(imageName.split('.')) == 1:
                 image['class'] = 'vectorImage'
-                imageCompleteName += '.svg'
+                imageName += '.svg'
 
-            imagePath = f"{localPath}/{imageCompleteName}"
+            imageCompletePath = os.path.join(imageBasePath, imageName)
+
             response = requests.get(imageSrc)
-            with open(f'{imagePath}', 'wb') as f:
+            with open(f'{imageCompletePath}', 'wb') as f:
                 f.write(response.content)
 
-            image['src'] = imagePath
+            image['src'] = imageCompletePath
     except Exception as e:
+        print(e)
         print(f"Couldn't download {imageSrc}")
 
-    externalLink = soup.find(id='External_links')
-    if externalLink is not None:
-        for sibling in externalLink.find_all_next():
+    externalLinkDiv = soup.find(id='External_links')
+    if externalLinkDiv is not None:
+        for sibling in externalLinkDiv.find_all_next():
             sibling.decompose()
-        externalLink.decompose()
+        externalLinkDiv.decompose()
 
     for editSection in articleBody.find_all(class_='mw-editsection'):
         editSection.decompose()
 
     htmlBase = open(baseHtmlPath, 'r', encoding='utf-8').read()
     htmlBase = htmlBase.replace('#articleTitle', articleName)
-    htmlBase = htmlBase.replace('#theme', theme)
+    htmlBase = htmlBase.replace('#theme', cssTheme)
     htmlBase = htmlBase.replace('#articleBody', str(articleBody.prettify))
 
-    with open(htmlFinalPath, 'w', encoding='utf-8') as f:
+    with open(htmlPath, 'w', encoding='utf-8') as f:
         f.write(htmlBase)
