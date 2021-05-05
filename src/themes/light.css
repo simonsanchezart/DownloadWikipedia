@@ -66,6 +66,12 @@ body{
     box-shadow: none !important;
 }
 
+p .vectorImage{
+    padding: 0.2em;
+    margin: 0;
+    box-shadow: none !important;
+}
+
 .navbar-mini{
     display: none !important;
 }

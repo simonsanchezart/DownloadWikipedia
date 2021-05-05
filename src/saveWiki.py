@@ -3,11 +3,12 @@ import os
 import pathlib
 import urllib.parse
 import sys
+from shutil import copyfile
 from bs4 import BeautifulSoup
 
 scriptPath = pathlib.Path(__file__).parent.absolute()
 baseHtmlPath = os.path.join(scriptPath, 'base.html')
-cssThemes = os.path.join(scriptPath, 'themes')
+cssThemesPath = os.path.join(scriptPath, 'themes')
 
 invalidChars = ('\\', '/', ':', '*', '?', '"', '<', '>', '|', '(', ')', '%')
 invalidWords = ('png', 'jpeg', 'jpg', 'Wikipedia:', 'File:', '#', '.webm')
@@ -24,7 +25,13 @@ def NameFromLink(link):
 
     return name
 
-cssTheme = os.path.join(cssThemes, sys.argv[1]) 
+cssThemeName = sys.argv[1]
+cssThemePath = os.path.join(cssThemesPath, f"{cssThemeName}.css") 
+copyPath = os.path.join(os.path.join(os.getcwd(), f"{cssThemeName}.css"))
+copyfile(cssThemePath, copyPath)
+
+cssThemePath = copyPath
+
 articleLinks = sys.argv[2:]
 
 i = 0
@@ -84,6 +91,7 @@ for articleLink in articleLinks:
 
     imageBasePath = os.path.join(localPath, 'images')
     os.makedirs(imageBasePath, exist_ok=True)
+    allImages = []
     try:
         for image in articleBody.find_all('img'):
             if 'https:' in image['src']:
@@ -121,7 +129,7 @@ for articleLink in articleLinks:
 
     htmlBase = open(baseHtmlPath, 'r', encoding='utf-8').read()
     htmlBase = htmlBase.replace('#articleTitle', articleName)
-    htmlBase = htmlBase.replace('#theme', cssTheme)
+    htmlBase = htmlBase.replace('#theme', cssThemePath)
     htmlBase = htmlBase.replace('#articleBody', str(articleBody.prettify))
 
     with open(htmlPath, 'w', encoding='utf-8') as f:
