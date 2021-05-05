@@ -25,13 +25,7 @@ def NameFromLink(link):
 
     return name
 
-cssThemeName = sys.argv[1]
-cssThemePath = os.path.join(cssThemesPath, f"{cssThemeName}.css") 
-copyPath = os.path.join(os.path.join(os.getcwd(), f"{cssThemeName}.css"))
-copyfile(cssThemePath, copyPath)
-
-cssThemePath = copyPath
-
+cssThemePath = os.path.join(cssThemesPath, f"{sys.argv[1]}.css") 
 articleLinks = sys.argv[2:]
 
 i = 0
