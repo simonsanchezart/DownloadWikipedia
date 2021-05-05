@@ -45,7 +45,7 @@ The empty theme is a completely empty .css theme that you can use to create your
 
 You can also use either the Dark or Light theme as a template for another theme.
 
-You can modify the colors in `@root` to quickly create themes:
+You can modify the colors in `:root` to quickly create themes:
 
 ```css
 :root{
